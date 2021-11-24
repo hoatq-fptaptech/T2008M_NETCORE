@@ -17,6 +17,7 @@ namespace T2008M_NetCoreApi
 {
     public class Startup
     {
+        readonly string MyAllowOrigins = "_myAllowOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,6 +31,13 @@ namespace T2008M_NetCoreApi
             // them ket noi db 
             var connectionString = Configuration.GetConnectionString("T2008M_Database");
             services.AddDbContextPool<T2008MContext>(options => options.UseSqlServer(connectionString));
+
+            // add CORS
+            services.AddCors(options=> {
+                options.AddPolicy(name: MyAllowOrigins,
+                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+                    );
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -51,7 +59,7 @@ namespace T2008M_NetCoreApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseCors(MyAllowOrigins);
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
