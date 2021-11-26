@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using T2008M_NetCoreApi.Models;
-
+using Microsoft.AspNetCore.Authorization;
 namespace T2008M_NetCoreApi.Controllers
 {
+    [Authorize] // muốn sử dụng phải có authorize trước 
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase

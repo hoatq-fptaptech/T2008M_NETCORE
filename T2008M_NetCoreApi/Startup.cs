@@ -13,6 +13,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using T2008M_NetCoreApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 namespace T2008M_NetCoreApi
 {
     public class Startup
@@ -40,6 +43,21 @@ namespace T2008M_NetCoreApi
             });
 
             services.AddControllers();
+            // add Authorize with token (JWT)
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
+                options=>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters() { 
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "T2008M_NetCoreApi", Version = "v1" });
@@ -60,6 +78,7 @@ namespace T2008M_NetCoreApi
 
             app.UseRouting();
             app.UseCors(MyAllowOrigins);
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
